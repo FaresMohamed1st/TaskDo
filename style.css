@@ -715,7 +715,7 @@ button {
         transition: all var(--transition-fast);
     }
 
-    .sidebar.active ~ .main-content .menu-toggle {
+    .sidebar.active~.main-content .menu-toggle {
         margin-left: 1rem;
         background: var(--primary-color);
         color: white;
@@ -728,7 +728,7 @@ button {
         transform: scale(1.05);
     }
 
-    .sidebar.active ~ .main-content .menu-toggle:hover {
+    .sidebar.active~.main-content .menu-toggle:hover {
         color: white;
         background: var(--primary-hover);
     }
@@ -802,7 +802,8 @@ button {
         flex-direction: column;
     }
 
-    .filter-group, .sort-group {
+    .filter-group,
+    .sort-group {
         width: 100%;
     }
 
@@ -814,7 +815,8 @@ button {
         flex-direction: column-reverse;
     }
 
-    .btn-primary, .btn-secondary {
+    .btn-primary,
+    .btn-secondary {
         width: 100%;
         justify-content: center;
     }
@@ -891,4 +893,22 @@ option::active {
 .sidebar-overlay.active {
     display: block;
     opacity: 1;
+}
+
+.main-header {
+    background-color: var(--card-background);
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    z-index: var(--z-index-header);
+    backdrop-filter: blur(8px);
+    background-color: rgba(#2d2d2d, 0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
