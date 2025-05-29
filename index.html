@@ -10,8 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
-    <div class="app-container">
+<body>    <div class="app-container">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay"></div>
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -76,22 +77,28 @@
 
             <!-- Task Filters -->
             <div class="filters-bar">
-                <div class="filter-group">
+                <div class="filter-group custom-select-wrapper">
                     <label><i class="fas fa-filter"></i></label>
-                    <select id="filter-priority">
-                        <option value="all">All Priorities</option>
-                        <option value="high">High Priority</option>
-                        <option value="medium">Medium Priority</option>
-                        <option value="low">Low Priority</option>
-                    </select>
+                    <div class="custom-select" id="filter-priority">
+                        <div class="custom-select-trigger">All Priorities</div>
+                        <div class="custom-options">
+                            <div class="custom-option" data-value="all">All Priorities</div>
+                            <div class="custom-option" data-value="high">High Priority</div>
+                            <div class="custom-option" data-value="medium">Medium Priority</div>
+                            <div class="custom-option" data-value="low">Low Priority</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="sort-group">
+                <div class="sort-group custom-select-wrapper">
                     <label><i class="fas fa-sort"></i></label>
-                    <select id="sort-select">
-                        <option value="date-added">Date Added</option>
-                        <option value="due-date">Due Date</option>
-                        <option value="priority">Priority</option>
-                    </select>
+                    <div class="custom-select" id="sort-select">
+                        <div class="custom-select-trigger">Date Added</div>
+                        <div class="custom-options">
+                            <div class="custom-option" data-value="date-added">Date Added</div>
+                            <div class="custom-option" data-value="due-date">Due Date</div>
+                            <div class="custom-option" data-value="priority">Priority</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -114,23 +121,28 @@
                         <input type="text" id="todo-input" placeholder="What needs to be done?" required>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="priority-select">Priority</label>
-                            <select id="priority-select">
-                                <option value="low">Low Priority</option>
-                                <option value="medium">Medium Priority</option>
-                                <option value="high">High Priority</option>
-                            </select>
+                        <div class="form-group"> <label for="priority-select">Priority</label>
+                            <div class="custom-select" id="priority-select">
+                                <div class="custom-select-trigger">Low Priority</div>
+                                <div class="custom-options">
+                                    <div class="custom-option" data-value="low">Low Priority</div>
+                                    <div class="custom-option" data-value="medium">Medium Priority</div>
+                                    <div class="custom-option" data-value="high">High Priority</div>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="recurring-select">Repeat</label>
-                            <select id="recurring-select">
-                                <option value="none">One-time Task</option>
-                                <option value="daily">Daily</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="monthly">Monthly</option>
-                                <option value="yearly">Yearly</option>
-                            </select>
+                            <div class="custom-select" id="recurring-select">
+                                <div class="custom-select-trigger">One-time Task</div>
+                                <div class="custom-options">
+                                    <div class="custom-option" data-value="none">One-time Task</div>
+                                    <div class="custom-option" data-value="daily">Daily</div>
+                                    <div class="custom-option" data-value="weekly">Weekly</div>
+                                    <div class="custom-option" data-value="monthly">Monthly</div>
+                                    <div class="custom-option" data-value="yearly">Yearly</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-row">

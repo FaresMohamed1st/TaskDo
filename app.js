@@ -3,6 +3,16 @@ class TodoApp {
         this.todos = JSON.parse(localStorage.getItem('todos')) || [];
         this.categories = new Set(this.todos.map(todo => todo.category).filter(Boolean));
         this.currentView = 'all';
+        this.sidebarOpen = false;
+
+        // Setup custom selects
+        document.querySelectorAll('.custom-select').forEach(select => {
+            const options = select.querySelector('.custom-options');
+            const firstOption = options.querySelector('.custom-option');
+            if (firstOption) {
+                firstOption.classList.add('selected');
+            }
+        });
 
         // Initialize DOM elements
         this.initializeDOMElements();
@@ -17,18 +27,16 @@ class TodoApp {
         this.todoForm = document.getElementById('todo-form');
         this.todoList = document.getElementById('todo-list');
         this.modal = document.getElementById('task-modal');
-        this.sidebar = document.querySelector('.sidebar');
-
-        // Form inputs
+        this.sidebar = document.querySelector('.sidebar');        // Form inputs
         this.todoInput = document.getElementById('todo-input');
-        this.prioritySelect = document.getElementById('priority-select');
-        this.recurringSelect = document.getElementById('recurring-select');
+        this.prioritySelect = document.querySelector('#priority-select .custom-select-trigger');
+        this.recurringSelect = document.querySelector('#recurring-select .custom-select-trigger');
         this.dueDateInput = document.getElementById('due-date');
         this.categoryInput = document.getElementById('category-input');
 
         // Filters and sorting
-        this.filterPriority = document.getElementById('filter-priority');
-        this.sortSelect = document.getElementById('sort-select');
+        this.filterPriority = document.querySelector('#filter-priority .custom-select-trigger');
+        this.sortSelect = document.querySelector('#sort-select .custom-select-trigger');
 
         // Buttons
         this.themeToggle = document.getElementById('theme-toggle');
@@ -52,10 +60,22 @@ class TodoApp {
         });
 
         // Theme toggle
-        this.themeToggle.addEventListener('click', () => this.toggleTheme());
-
-        // Mobile menu toggle
+        this.themeToggle.addEventListener('click', () => this.toggleTheme());        // Mobile menu toggle
         this.menuToggle.addEventListener('click', () => this.toggleSidebar());
+
+        // Handle clicking outside sidebar
+        document.querySelector('.sidebar-overlay').addEventListener('click', () => {
+            if (this.sidebarOpen) {
+                this.toggleSidebar();
+            }
+        });
+
+        // Close sidebar on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.sidebarOpen) {
+                this.toggleSidebar();
+            }
+        });
 
         // Modal controls
         this.addTaskButton.addEventListener('click', () => this.openModal());
@@ -81,20 +101,44 @@ class TodoApp {
         this.modal.addEventListener('click', (e) => {
             if (e.target === this.modal) this.closeModal();
         });
-    }
-
-    toggleSidebar() {
+    }    toggleSidebar() {
+        this.sidebarOpen = !this.sidebarOpen;
         this.sidebar.classList.toggle('active');
+        document.querySelector('.sidebar-overlay').classList.toggle('active');
+        
+        if (this.sidebarOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
     }
 
     openModal() {
         this.modal.classList.add('active');
         this.todoInput.focus();
-    }
-
-    closeModal() {
+    } closeModal() {
         this.modal.classList.remove('active');
         this.todoForm.reset();
+
+        // Reset custom selects to default values
+        const prioritySelect = document.querySelector('#priority-select');
+        const recurringSelect = document.querySelector('#recurring-select');
+
+        // Reset priority select
+        const defaultPriority = prioritySelect.querySelector('.custom-option[data-value="low"]');
+        if (defaultPriority) {
+            prioritySelect.querySelector('.custom-option.selected')?.classList.remove('selected');
+            defaultPriority.classList.add('selected');
+            prioritySelect.querySelector('.custom-select-trigger').textContent = defaultPriority.textContent;
+        }
+
+        // Reset recurring select
+        const defaultRecurring = recurringSelect.querySelector('.custom-option[data-value="none"]');
+        if (defaultRecurring) {
+            recurringSelect.querySelector('.custom-option.selected')?.classList.remove('selected');
+            defaultRecurring.classList.add('selected');
+            recurringSelect.querySelector('.custom-select-trigger').textContent = defaultRecurring.textContent;
+        }
     } setCurrentView(view) {
         this.currentView = view;
         document.querySelector('.sidebar-nav li.active')?.classList.remove('active');
@@ -130,11 +174,9 @@ class TodoApp {
         this.searchInput.value = '';
         this.renderTodos();
         this.searchInput.focus();
-    }
-
-    filterTodos(searchTerm = '') {
+    } filterTodos(searchTerm = '') {
         let filteredTodos = [...this.todos];
-        const priority = this.filterPriority.value;
+        const priority = this.filterPriority.closest('.custom-select').querySelector('.custom-option.selected')?.getAttribute('data-value') || 'all';
 
         // Filter by search term
         if (searchTerm) {
@@ -177,10 +219,8 @@ class TodoApp {
         // Filter by priority
         if (priority !== 'all') {
             filteredTodos = filteredTodos.filter(todo => todo.priority === priority);
-        }
-
-        // Sort todos
-        const sortBy = this.sortSelect.value;
+        }        // Sort todos
+        const sortBy = this.sortSelect.closest('.custom-select').querySelector('.custom-option.selected')?.getAttribute('data-value') || 'date-added';
         filteredTodos.sort((a, b) => {
             switch (sortBy) {
                 case 'due-date':
@@ -194,12 +234,10 @@ class TodoApp {
         });
 
         return filteredTodos;
-    }
-
-    addTodo() {
+    } addTodo() {
         const text = this.todoInput.value.trim();
-        const priority = this.prioritySelect.value;
-        const recurring = this.recurringSelect.value;
+        const priority = this.prioritySelect.closest('.custom-select').querySelector('.custom-option.selected')?.getAttribute('data-value') || 'low';
+        const recurring = this.recurringSelect.closest('.custom-select').querySelector('.custom-option.selected')?.getAttribute('data-value') || 'none';
         const dueDate = this.dueDateInput.value;
         const category = this.categoryInput.value.trim();
 
@@ -338,6 +376,89 @@ class TodoApp {
         const icon = this.themeToggle.querySelector('i');
         icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
     }
+}
+
+// Custom Select Box Implementation
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize all custom select boxes
+    document.querySelectorAll('.custom-select').forEach(setupCustomSelect);
+
+    // Close all custom selects when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.custom-select')) {
+            document.querySelectorAll('.custom-select').forEach(select => {
+                select.classList.remove('open');
+            });
+        }
+    });
+});
+
+function setupCustomSelect(select) {
+    const trigger = select.querySelector('.custom-select-trigger');
+    const options = select.querySelector('.custom-options');
+
+    // Toggle select on trigger click
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAllCustomSelects(select);
+        select.classList.toggle('open');
+    });    // Add keyboard navigation
+    select.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            select.classList.toggle('open');
+        } else if (e.key === 'Escape') {
+            select.classList.remove('open');
+        }
+    });
+
+    // Handle option selection
+    options.querySelectorAll('.custom-option').forEach(option => {
+        // Make options focusable
+        option.setAttribute('tabindex', '0');
+
+        // Handle both click and keyboard events
+        ['click', 'keydown'].forEach(eventType => {
+            option.addEventListener(eventType, (e) => {
+                if (eventType === 'keydown' && e.key !== 'Enter') return;
+                e.stopPropagation();
+
+                if (!option.classList.contains('selected')) {
+                    // Update selected option
+                    options.querySelector('.custom-option.selected')?.classList.remove('selected');
+                    option.classList.add('selected');
+
+                    // Update trigger text
+                    trigger.textContent = option.textContent;
+
+                    // Update original select if it exists
+                    const originalSelect = document.querySelector(`select#${select.id}`);
+                    if (originalSelect) {
+                        originalSelect.value = option.getAttribute('data-value');
+                        // Dispatch change event
+                        const event = new Event('change', { bubbles: true });
+                        originalSelect.dispatchEvent(event);
+                    }
+
+                    // Close the select
+                    select.classList.remove('open');
+
+                    // Trigger todo list update if this is a filter or sort select
+                    if (select.id === 'filter-priority' || select.id === 'sort-select') {
+                        app.renderTodos(document.getElementById('search-tasks').value.toLowerCase().trim());
+                    }
+                }
+            });
+        });
+    });
+}
+
+function closeAllCustomSelects(exceptSelect) {
+    document.querySelectorAll('.custom-select').forEach(select => {
+        if (select !== exceptSelect) {
+            select.classList.remove('open');
+        }
+    });
 }
 
 // Initialize the app
