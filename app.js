@@ -1,9 +1,116 @@
+class NotificationManager {
+    constructor() {
+        this.checkPermission();
+        this.notifications = new Map(); // Map of taskId to timeout/interval IDs
+        this.initNotificationSound();
+    }
+
+    async checkPermission() {
+        if (!("Notification" in window)) {
+            console.warn("This browser does not support notifications");
+            return false;
+        }
+
+        if (Notification.permission === "default") {
+            await Notification.requestPermission();
+        }
+
+        return Notification.permission === "granted";
+    }
+
+    initNotificationSound() {
+        // Simple beep sound encoded in base64 to avoid external dependencies
+        this.notificationSound = new Audio("data:audio/wav;base64,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");
+    }
+
+    scheduleNotification(task) {
+        if (!task.notifications?.enabled || !task.dueDate || !task.dueTime) return;
+
+        // Clear any existing notification for this task
+        this.clearNotification(task.id);
+
+        const dueDateTime = new Date(`${task.dueDate}T${task.dueTime}`);
+        const preAlertMinutes = parseInt(task.notifications.preAlert) || 10;
+        const repeatInterval = parseInt(task.notifications.repeatInterval) || 0;
+
+        // Calculate initial notification time (preAlert minutes before due time)
+        const initialAlertTime = new Date(dueDateTime);
+        initialAlertTime.setMinutes(initialAlertTime.getMinutes() - preAlertMinutes);
+
+        const now = new Date();
+        if (initialAlertTime > now) {
+            const timeoutId = setTimeout(() => {
+                this.showNotification(task);
+
+                // Set up repeating notifications if enabled
+                if (repeatInterval > 0) {
+                    const intervalId = setInterval(() => {
+                        const currentTime = new Date();
+                        if (currentTime >= dueDateTime) {
+                            this.clearNotification(task.id);
+                        } else {
+                            this.showNotification(task);
+                        }
+                    }, repeatInterval * 60 * 1000); // Convert minutes to milliseconds
+
+                    this.notifications.set(task.id, {
+                        timeoutId: timeoutId,
+                        intervalId: intervalId
+                    });
+                } else {
+                    this.notifications.set(task.id, { timeoutId: timeoutId });
+                }
+            }, initialAlertTime.getTime() - now.getTime());
+        }
+    }
+
+    showNotification(task) {
+        if (Notification.permission !== "granted") return;
+
+        // Play sound
+        this.notificationSound?.play().catch(() => { });
+
+        const timeStr = task.dueTime || "00:00";
+        const notification = new Notification("TaskDo Reminder", {
+            body: `Task "${task.text}" is due at ${timeStr}`,
+            icon: "/favicon.ico", // Assuming favicon exists
+            badge: "/favicon.ico",
+            silent: true // We handle sound manually
+        });
+
+        notification.onclick = () => {
+            window.focus();
+            notification.close();
+        };
+    }
+
+    clearNotification(taskId) {
+        const notificationInfo = this.notifications.get(taskId);
+        if (notificationInfo) {
+            if (notificationInfo.timeoutId) {
+                clearTimeout(notificationInfo.timeoutId);
+            }
+            if (notificationInfo.intervalId) {
+                clearInterval(notificationInfo.intervalId);
+            }
+            this.notifications.delete(taskId);
+        }
+    }
+
+    clearAllNotifications() {
+        for (const taskId of this.notifications.keys()) {
+            this.clearNotification(taskId);
+        }
+    }
+}
+
 class TodoApp {
     constructor() {
         this.todos = JSON.parse(localStorage.getItem('todos')) || [];
         this.categories = new Set(this.todos.map(todo => todo.category).filter(Boolean));
         this.currentView = 'all';
         this.sidebarOpen = false;
+        this.notificationManager = new NotificationManager();
 
         // Setup custom selects
         document.querySelectorAll('.custom-select').forEach(select => {
@@ -20,6 +127,13 @@ class TodoApp {
         this.initializeEventListeners();
         this.updateCategoryList();
         this.renderTodos('');
+
+        // Reschedule notifications for existing tasks
+        this.todos.forEach(todo => {
+            if (!todo.completed && todo.notifications?.enabled) {
+                this.notificationManager.scheduleNotification(todo);
+            }
+        });
     }
 
     initializeDOMElements() {
@@ -46,6 +160,10 @@ class TodoApp {
         // Search elements
         this.searchInput = document.getElementById('search-tasks');
         this.clearSearchBtn = document.getElementById('clear-search');
+
+        // Add notification elements
+        this.notificationToggle = document.getElementById('enable-notifications');
+        this.notificationOptions = document.querySelector('.notification-options');
 
         // Set minimum date for due date input
         this.dueDateInput.min = new Date().toISOString().split('T')[0];
@@ -101,11 +219,17 @@ class TodoApp {
         this.modal.addEventListener('click', (e) => {
             if (e.target === this.modal) this.closeModal();
         });
-    }    toggleSidebar() {
+
+        // Add notification toggle event listener
+        this.notificationToggle?.addEventListener('change', () => {
+            this.notificationOptions.style.display =
+                this.notificationToggle.checked ? 'block' : 'none';
+        });
+    } toggleSidebar() {
         this.sidebarOpen = !this.sidebarOpen;
         this.sidebar.classList.toggle('active');
         document.querySelector('.sidebar-overlay').classList.toggle('active');
-        
+
         if (this.sidebarOpen) {
             document.body.style.overflow = 'hidden';
         } else {
@@ -119,6 +243,8 @@ class TodoApp {
     } closeModal() {
         this.modal.classList.remove('active');
         this.todoForm.reset();
+        this.notificationOptions.style.display = 'none';
+        this.notificationToggle.checked = false;
 
         // Reset custom selects to default values
         const prioritySelect = document.querySelector('#priority-select');
@@ -139,6 +265,16 @@ class TodoApp {
             defaultRecurring.classList.add('selected');
             recurringSelect.querySelector('.custom-select-trigger').textContent = defaultRecurring.textContent;
         }
+
+        // Reset all custom selects
+        document.querySelectorAll('.custom-select').forEach(select => {
+            const defaultOption = select.querySelector('.custom-option');
+            if (defaultOption) {
+                select.querySelector('.custom-option.selected')?.classList.remove('selected');
+                defaultOption.classList.add('selected');
+                select.querySelector('.custom-select-trigger').textContent = defaultOption.textContent;
+            }
+        });
     } setCurrentView(view) {
         this.currentView = view;
         document.querySelector('.sidebar-nav li.active')?.classList.remove('active');
@@ -236,10 +372,22 @@ class TodoApp {
         return filteredTodos;
     } addTodo() {
         const text = this.todoInput.value.trim();
-        const priority = this.prioritySelect.closest('.custom-select').querySelector('.custom-option.selected')?.getAttribute('data-value') || 'low';
-        const recurring = this.recurringSelect.closest('.custom-select').querySelector('.custom-option.selected')?.getAttribute('data-value') || 'none';
+        const priority = this.prioritySelect.closest('.custom-select')
+            .querySelector('.custom-option.selected')?.getAttribute('data-value') || 'low';
+        const recurring = this.recurringSelect.closest('.custom-select')
+            .querySelector('.custom-option.selected')?.getAttribute('data-value') || 'none';
         const dueDate = this.dueDateInput.value;
+        const dueTime = document.getElementById('due-time').value;
         const category = this.categoryInput.value.trim();
+
+        // Get notification settings
+        const notifications = this.notificationToggle.checked ? {
+            enabled: true,
+            preAlert: document.querySelector('#pre-alert-select .custom-option.selected')
+                ?.getAttribute('data-value') || '10',
+            repeatInterval: document.querySelector('#repeat-interval-select .custom-option.selected')
+                ?.getAttribute('data-value') || '0'
+        } : { enabled: false };
 
         if (text) {
             const todo = {
@@ -248,7 +396,9 @@ class TodoApp {
                 priority,
                 recurring: recurring !== 'none' ? recurring : null,
                 dueDate,
+                dueTime,
                 category,
+                notifications,
                 completed: false,
                 dateAdded: new Date().toISOString()
             };
@@ -258,15 +408,17 @@ class TodoApp {
             if (category && !this.categories.has(category)) {
                 this.categories.add(category);
                 this.updateCategoryList();
-            } this.saveTodos();
-            this.renderTodos(this.searchInput.value.toLowerCase().trim());
-        }
-    }
+            }
 
-    deleteTodo(id) {
-        this.todos = this.todos.filter(todo => todo.id !== id);
-        this.saveTodos();
-        this.renderTodos(this.searchInput.value.toLowerCase().trim());
+            // Schedule notification if enabled
+            if (notifications.enabled) {
+                this.notificationManager.scheduleNotification(todo);
+            }
+
+            this.saveTodos();
+            this.renderTodos(this.searchInput.value.toLowerCase().trim());
+            this.closeModal();
+        }
     }
 
     toggleTodo(id) {
@@ -274,38 +426,32 @@ class TodoApp {
         if (todo) {
             todo.completed = !todo.completed;
 
+            // Clear notifications when completed
+            if (todo.completed) {
+                this.notificationManager.clearNotification(todo.id);
+            } else if (todo.notifications?.enabled) {
+                // Reschedule notifications if uncompleted
+                this.notificationManager.scheduleNotification(todo);
+            }
+
             if (todo.recurring && todo.completed) {
                 this.scheduleNextRecurrence(todo);
             }
 
             this.saveTodos();
-            this.renderTodos();
+            this.renderTodos(this.searchInput.value.toLowerCase().trim());
         }
     }
 
-    scheduleNextRecurrence(todo) {
-        const nextDueDate = new Date(todo.dueDate);
-        switch (todo.recurring) {
-            case 'daily':
-                nextDueDate.setDate(nextDueDate.getDate() + 1);
-                break;
-            case 'weekly':
-                nextDueDate.setDate(nextDueDate.getDate() + 7);
-                break;
-            case 'monthly':
-                nextDueDate.setMonth(nextDueDate.getMonth() + 1);
-                break;
-            case 'yearly':
-                nextDueDate.setFullYear(nextDueDate.getFullYear() + 1);
-                break;
-        }
-        todo.dueDate = nextDueDate.toISOString().split('T')[0];
-        todo.completed = false;
+    deleteTodo(id) {
+        // Clear any active notifications
+        this.notificationManager.clearNotification(id);
+        this.todos = this.todos.filter(todo => todo.id !== id);
+        this.saveTodos();
+        this.renderTodos(this.searchInput.value.toLowerCase().trim());
     }
 
-    saveTodos() {
-        localStorage.setItem('todos', JSON.stringify(this.todos));
-    } renderTodos(searchTerm = '') {
+    renderTodos(searchTerm = '') {
         this.todoList.innerHTML = '';
         const filteredTodos = this.filterTodos(searchTerm);
 
@@ -314,17 +460,21 @@ class TodoApp {
             todoElement.className = `todo-item priority-${todo.priority}${todo.completed ? ' completed' : ''}`;
 
             const dueDate = todo.dueDate ? new Date(todo.dueDate).toLocaleDateString() : 'No due date';
+            const dueTime = todo.dueTime || '';
             const recurringIcon = todo.recurring ?
                 `<span class="recurring-icon" title="${todo.recurring}"><i class="fas fa-redo"></i></span>` : '';
+            const notificationIcon = todo.notifications?.enabled ?
+                `<span class="notification-icon" title="Reminder set"><i class="fas fa-bell"></i></span>` : '';
 
             todoElement.innerHTML = `
                 <div class="todo-content">
                     <div class="todo-text">
                         ${todo.text}
                         ${recurringIcon}
+                        ${notificationIcon}
                     </div>
                     <div class="todo-meta">
-                        <span><i class="far fa-calendar"></i> ${dueDate}</span>
+                        <span><i class="far fa-calendar"></i> ${dueDate}${dueTime ? ` at ${dueTime}` : ''}</span>
                         ${todo.category ?
                     `<span class="category-tag"><i class="fas fa-tag"></i> ${todo.category}</span>` : ''}
                     </div>

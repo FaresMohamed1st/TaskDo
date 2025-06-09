@@ -10,7 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>    <div class="app-container">
+<body>
+    <div class="app-container">
         <!-- Sidebar Overlay -->
         <div class="sidebar-overlay"></div>
         <!-- Sidebar -->
@@ -147,12 +148,52 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="due-date">Due Date</label>
-                            <input type="date" id="due-date">
+                            <label for="due-date">Due Date & Time</label>
+                            <div class="datetime-inputs">
+                                <input type="date" id="due-date">
+                                <input type="time" id="due-time" value="00:00">
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="category-input">Category</label>
                             <input type="text" id="category-input" placeholder="Add or select category">
+                        </div>
+                    </div>
+                    <div class="notification-settings">
+                        <div class="notification-header">
+                            <label class="notification-toggle">
+                                <input type="checkbox" id="enable-notifications">
+                                <span>Enable Reminders</span>
+                            </label>
+                        </div>
+                        <div class="notification-options" style="display: none;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="pre-alert-select">Alert Before</label>
+                                    <div class="custom-select" id="pre-alert-select">
+                                        <div class="custom-select-trigger">10 minutes before</div>
+                                        <div class="custom-options">
+                                            <div class="custom-option" data-value="5">5 minutes before</div>
+                                            <div class="custom-option" data-value="10">10 minutes before</div>
+                                            <div class="custom-option" data-value="15">15 minutes before</div>
+                                            <div class="custom-option" data-value="30">30 minutes before</div>
+                                            <div class="custom-option" data-value="60">1 hour before</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="repeat-interval-select">Repeat Alert</label>
+                                    <div class="custom-select" id="repeat-interval-select">
+                                        <div class="custom-select-trigger">Don't repeat</div>
+                                        <div class="custom-options">
+                                            <div class="custom-option" data-value="0">Don't repeat</div>
+                                            <div class="custom-option" data-value="30">Every 30 minutes</div>
+                                            <div class="custom-option" data-value="60">Every hour</div>
+                                            <div class="custom-option" data-value="120">Every 2 hours</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-actions">
@@ -160,11 +201,12 @@
                         <button type="submit" class="btn-primary">Add Task</button>
                     </div>
                 </form>
-            </div>        </div>
+            </div>
+        </div>
     </div>
     <!-- Footer -->
     <footer class="footer">
-        Made with ♡ by 
+        Made with ♡ by
         <a href="https://wa.me/201124765003" target="_blank" class="whatsapp-link">
             <i class="fab fa-whatsapp"></i> Fares Mohamed
         </a>
