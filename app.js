@@ -370,12 +370,10 @@ class TodoApp {
         });
 
         return filteredTodos;
-    } addTodo() {
+    }    addTodo() {
         const text = this.todoInput.value.trim();
-        const priority = this.prioritySelect.closest('.custom-select')
-            .querySelector('.custom-option.selected')?.getAttribute('data-value') || 'low';
-        const recurring = this.recurringSelect.closest('.custom-select')
-            .querySelector('.custom-option.selected')?.getAttribute('data-value') || 'none';
+        const priority = document.querySelector('#priority-select .custom-option.selected')?.getAttribute('data-value') || 'low';
+        const recurring = document.querySelector('#recurring-select .custom-option.selected')?.getAttribute('data-value') || 'none';
         const dueDate = this.dueDateInput.value;
         const dueTime = document.getElementById('due-time').value;
         const category = this.categoryInput.value.trim();
@@ -525,6 +523,10 @@ class TodoApp {
     updateThemeIcon(theme) {
         const icon = this.themeToggle.querySelector('i');
         icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    saveTodos() {
+        localStorage.setItem('todos', JSON.stringify(this.todos));
     }
 }
 
